@@ -2,15 +2,10 @@ import axios from "axios";
 
 const ProductCard = ({ product }) => {
   const handleAddToCart = async () => {
-    const token = localStorage.getItem("token");
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    };
+    // const token = localStorage.getItem("token");
 
     const data = {
+      userId: "666b11a6eb930b2299c325d5",
       products: [
         {
           imageUrl: product.image,
@@ -22,14 +17,14 @@ const ProductCard = ({ product }) => {
     };
 
     try {
+      // console.log("Sending request to add product to cart:", data);
       const response = await axios.post(
         "http://localhost:5000/api/cart/add",
-        data,
-        config
+        data
       );
       console.log("Adding product to cart:", response.data);
     } catch (error) {
-      console.error("Error adding product to cart:", error);
+      console.error("Error adding product to cart:", error.response || error);
     }
   };
 

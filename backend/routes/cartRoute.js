@@ -1,49 +1,54 @@
 const express = require("express");
-const { Cart } = require("../models/cartModel");
-const Auth = require("../middleware/auth");
+const Cart = require("../models/cartModel");
 const router = express.Router();
 
-router.use(Auth);
-
-router.post("/add", Auth, async (req, res) => {
+router.post("/add", async (req, res) => {
   try {
-    const { products } = req.body;
-    const userId = req.user.id;
-    console.log(userId);
+    const { userId, products } = req.body;
+    console.log("Received request to add items to cart:", userId, products);
 
-    const user = await Cart.findOne({ user: userId });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    let cart = await Cart.findOne({ user: userId });
+
+    if (!cart) {
+      cart = new Cart({ user: userId, products: [], totalAmount: 0 });
     }
 
-    const totalAmount = products.reduce(
+    cart.products.push(...products);
+
+    const totalAmount = cart.products.reduce(
       (acc, product) => acc + product.price * product.quantity,
       0
     );
+    cart.totalAmount = totalAmount;
 
-    user.cart.products = products;
-    user.cart.totalAmount = totalAmount;
+    await cart.save();
 
-    await user.save();
+    console.log("Cart updated successfully:", cart);
 
     res.status(201).json({ message: "Item/items added to cart successfully!" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error adding product to cart:", error.message);
+    res.status(500).json({ error: "Failed to add items to cart" });
   }
 });
 
-router.get("/myCart", Auth, async (req, res) => {
+router.get("/myCart", async (req, res) => {
   try {
-    const userId = req.user.id;
-    const user = await Cart.findOne({ user: userId });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const { userId } = req.body;
+    const cart = await Cart.findOne({});
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
     }
 
-    res.json({ message: "Cart Items", cartItems: user.cart });
+    res.json({
+      message: "Cart Items",
+      cartItems: cart.products,
+      totalAmount: cart.totalAmount,
+    });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).send("Server error, can't find cart items");
+    console.error("Error fetching cart items:", error.message);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
