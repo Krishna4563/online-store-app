@@ -6,10 +6,10 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import Home from "./components/home";
-import Login from "./components/Auth/login";
-import Register from "./components/Auth/register";
-import Cart from "./components/cart";
+import Home from "./components/home.jsx";
+import Login from "./components/Auth/login.jsx";
+import Register from "./components/Auth/register.jsx";
+import Cart from "./components/cart.jsx";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
