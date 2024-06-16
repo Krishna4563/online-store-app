@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import Navbar from "./Navbar";
+import Navbar from "./navbar";
 import axios from "axios";
 import ProductCard from "./productCard";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
